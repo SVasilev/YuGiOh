@@ -7,7 +7,7 @@ const int circleW_H = 100;
 
 int main()
 {
-    sf::RenderWindow MyGame(sf::VideoMode(800, 600, 32), "MyGame", sf::Style::Resize);
+    sf::RenderWindow MyGame(sf::VideoMode(800, 600, 32), "MyGame", sf::Style::Close);
     sf::Clock timer;
 
     int ballsCatched = 0;
@@ -65,7 +65,7 @@ int main()
         int microseconds = timer.getElapsedTime().asMicroseconds();
         if(timer.getElapsedTime().asMilliseconds() > millisecondsInterval)
         {
-            ball.move(0, 0.01);
+            ball.move(0, 1);
             if(ball.getPosition().y == rectangle.getPosition().y - circleW_H &&
                ball.getPosition().x >= rectangle.getPosition().x - circleW_H &&
                ball.getPosition().x <= rectangle.getPosition().x + rectangleWidth)
