@@ -1,12 +1,21 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <cstdlib>
+#include <ctime>
 
 const int rectangleWidth = 200;
 const int rectangleHeight = 30;
-const int circleW_H = 100;
+const int circleW_H = 160;
+
+int rand_x(sf::RenderWindow &MyGame)
+{
+    int result = rand() % (MyGame.getSize().x - circleW_H + 1);
+    return result;
+}
 
 int main()
 {
+    srand(time(0));
     sf::RenderWindow MyGame(sf::VideoMode(800, 600, 32), "MyGame", sf::Style::Close);
     sf::Clock timer;
 
@@ -21,13 +30,13 @@ int main()
 
     int millisecondsInterval = 3;
     sf::Texture texBall;
-    texBall.loadFromFile("ball.png");
+    texBall.loadFromFile("D:\\Cpp\\Git\\YuGiOh\\assets\\dedovina.png");
     sf::Sprite ball;
     ball.setTexture(texBall);
     ball.setPosition(300, 30);
 
     sf::Texture texRect;
-    texRect.loadFromFile("rect.png");
+    texRect.loadFromFile("D:\\Cpp\\Git\\YuGiOh\\assets\\rect.png");
     sf::Sprite rectangle;
     rectangle.setTexture(texRect);
     rectangle.setPosition(300, 570);
@@ -71,7 +80,7 @@ int main()
                ball.getPosition().x <= rectangle.getPosition().x + rectangleWidth)
             {
                 ballsCatched++;
-                microseconds = (microseconds % 1000) * 2;
+                microseconds = rand_x(MyGame);
                 if(microseconds <= MyGame.getSize().x - circleW_H) ball.setPosition(microseconds, 30);
                 else ball.setPosition(0, 30);
             }
