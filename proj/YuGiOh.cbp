@@ -42,6 +42,8 @@
 			<Add directory="..\thirdparty\SFML\lib" />
 		</Linker>
 		<Unit filename="..\source\main.cpp" />
+		<Unit filename="..\source\menu.cpp" />
+		<Unit filename="..\source\menu.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
