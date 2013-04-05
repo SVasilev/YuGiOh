@@ -1,7 +1,7 @@
 #include <iostream>
 #include "menu.h"
 
-Menu::Menu(int xCoor, int yCoor, sf::Text* array, int arrSize, int pad)//, int w, int h)
+Menu::Menu(int xCoor, int yCoor, sf::Text* array, int arrSize, double pad)//, int w, int h)
 {
     x = xCoor;
     y = yCoor;
@@ -9,19 +9,19 @@ Menu::Menu(int xCoor, int yCoor, sf::Text* array, int arrSize, int pad)//, int w
     for(int i = 0; i < arrSize; i++)
         txtArray[i] = array[i];
     arraySize = arrSize;
-    int maxTextW = txtArray[0].getGlobalBounds().width;
-    for(int i = 1; i < arraySize; i++)
-        if(txtArray[i].getGlobalBounds().width > maxTextW) maxTextW = txtArray[i].getGlobalBounds().width;
-    width = maxTextW;
     padding = pad;
-    height = padding;
-    for(int i = 0; i < arraySize; i++)
-        height += txtArray[i].getGlobalBounds().height + pad;
+    calculateGlobalBounds();
 }
 
 Menu::~Menu()
 {
     delete[] txtArray;
+}
+
+void Menu::calculateGlobalBounds()
+{
+    calculateWidth();
+    calculateHeight();
 }
 
 int Menu::getWidth() const
@@ -38,6 +38,38 @@ void Menu::setPosition(int left, int top)
 {
     x = left;
     y = top;
+}
+
+void Menu::calculateWidth()
+{
+    int maxTextW = txtArray[0].getGlobalBounds().width;
+    for(int i = 1; i < arraySize; i++)
+        if(txtArray[i].getGlobalBounds().width > maxTextW) maxTextW = txtArray[i].getGlobalBounds().width;
+    width =  maxTextW;
+}
+
+void Menu::calculateHeight()
+{
+    height = padding;
+    for(int i = 0; i < arraySize; i++)
+        height += txtArray[i].getGlobalBounds().height + padding;
+}
+
+void Menu::setArr(sf::Text* newArr, int size)
+{
+    delete[] txtArray;
+    txtArray = new sf::Text[size];
+    for(int i = 0; i < size; i++)
+        txtArray[i] = newArr[i];
+    arraySize = size;
+    calculateGlobalBounds();
+}
+
+void Menu::setTextSize(int size)
+{
+    for(int i = 0; i < arraySize; i++)
+        txtArray[i].setCharacterSize(size);
+    calculateGlobalBounds();
 }
 
 void Menu::display(sf::RenderWindow* aWindow) const
