@@ -14,6 +14,7 @@ public:
     void setPosition(int left, int top);
     int getWidth() const;
     int getHeight() const;
+    void display(sf::RenderWindow* aWindow) const;
 };
 
 #endif // MENU_H_INCLUDED

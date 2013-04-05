@@ -33,3 +33,20 @@ int Menu::getHeight() const
 {
     return height;
 }
+
+void Menu::setPosition(int left, int top)
+{
+    x = left;
+    y = top;
+}
+
+void Menu::display(sf::RenderWindow* aWindow) const
+{
+    txtArray[0].setPosition(x + padding + width / 2 - txtArray[0].getGlobalBounds().width / 2, y);
+    (*aWindow).draw(txtArray[0]);
+    for(int i = 1; i < arraySize; i++)
+    {
+        txtArray[i].setPosition(x + padding + width / 2 - txtArray[i].getGlobalBounds().width / 2, txtArray[i - 1].getPosition().y + padding + txtArray[i - 1].getGlobalBounds().height);
+        (*aWindow).draw(txtArray[i]);
+    }
+}
