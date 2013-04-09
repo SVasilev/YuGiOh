@@ -1,7 +1,7 @@
 #include <iostream>
 #include "menu.h"
 
-Menu::Menu(int xCoor, int yCoor, sf::Text* array, int arrSize, double pad)//, int w, int h)
+Menu::Menu(int xCoor, int yCoor, sf::Text* array, int arrSize, double pad, sf::Color textCol, sf::Color highlightCol)//, int w, int h)
 {
     x = xCoor;
     y = yCoor;
@@ -11,6 +11,9 @@ Menu::Menu(int xCoor, int yCoor, sf::Text* array, int arrSize, double pad)//, in
     arraySize = arrSize;
     padding = pad;
     calculateGlobalBounds();
+    textColor = textCol;
+    highlightColor = highlightCol;
+    applyTextColor();
 }
 
 Menu::~Menu()
@@ -72,7 +75,7 @@ void Menu::setTextSize(int size)
     calculateGlobalBounds();
 }
 
-void Menu::display(sf::RenderWindow* aWindow) const
+void Menu::display(sf::RenderWindow* aWindow)
 {
     txtArray[0].setPosition(x + padding + width / 2 - txtArray[0].getGlobalBounds().width / 2, y);
     (*aWindow).draw(txtArray[0]);
@@ -81,4 +84,49 @@ void Menu::display(sf::RenderWindow* aWindow) const
         txtArray[i].setPosition(x + padding + width / 2 - txtArray[i].getGlobalBounds().width / 2, txtArray[i - 1].getPosition().y + padding + txtArray[i - 1].getGlobalBounds().height);
         (*aWindow).draw(txtArray[i]);
     }
+    //Text Highlight
+    for(int i = 0; i < arraySize; i++)
+    {
+        if(textMouseOver(txtArray[i], aWindow))
+        {
+            txtArray[i].setColor(highlightColor);
+            break;
+        }
+        else applyTextColor();
+    }
+}
+
+void Menu::setTextColor(sf::Color aColor)
+{
+    textColor = aColor;
+}
+
+sf::Color Menu::getTextColor() const
+{
+    return textColor;
+}
+
+void Menu::setHighlightColor(sf::Color aColor)
+{
+    highlightColor = aColor;
+}
+
+sf::Color Menu::getHighlightColor() const
+{
+    return highlightColor;
+}
+
+void Menu::applyTextColor()
+{
+    for(int i = 0; i < arraySize; i++)
+        txtArray[i].setColor(textColor);
+}
+
+bool textMouseOver(sf::Text& aText, sf::RenderWindow* aWindow)
+{
+    if(sf::Mouse::getPosition(*aWindow).x >= aText.getPosition().x &&
+       sf::Mouse::getPosition(*aWindow).x <= aText.getPosition().x + aText.getGlobalBounds().width &&
+       sf::Mouse::getPosition(*aWindow).y >= aText.getPosition().y &&
+       sf::Mouse::getPosition(*aWindow).y <= aText.getPosition().y + aText.getGlobalBounds().height) return true;
+    return false;
 }
