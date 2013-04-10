@@ -1,7 +1,9 @@
 #include <iostream>
 #include "menu.h"
 
-Menu::Menu(sf::Text* array, int arrSize, int xCoor, int yCoor, double pad, sf::Font aFont, int txtSize, sf::Color textCol, sf::Color highlightCol)//, int w, int h)
+int rememberI = -1;
+
+Menu::Menu(sf::Text* array, int arrSize, int xCoor, int yCoor, double pad, sf::Font aFont, int txtSize, sf::Text::Style aStyle, sf::Color textCol, sf::Color highlightCol)//, sf::Sound highLSound)//, int w, int h)
 {
     txtArray = NULL;
     setArr(array, arrSize);
@@ -9,6 +11,7 @@ Menu::Menu(sf::Text* array, int arrSize, int xCoor, int yCoor, double pad, sf::F
     setPadding(pad);
     setTextFont(aFont);
     setTextSize(txtSize);
+    setTextStyle(aStyle);
     setTextColor(textCol);
     setHighlightColor(highlightCol);
 }
@@ -57,6 +60,11 @@ void Menu::setTextSize(int size)
     textSize = size;
 }
 
+void Menu::setTextStyle(sf::Text::Style aStyle)
+{
+    textStyle = aStyle;
+}
+
 void Menu::setTextColor(sf::Color aColor)
 {
     textColor = aColor;
@@ -65,6 +73,11 @@ void Menu::setTextColor(sf::Color aColor)
 void Menu::setHighlightColor(sf::Color aColor)
 {
     highlightColor = aColor;
+}
+
+void Menu::setHighlightSound(sf::Sound aSound)
+{
+    highlightSound = aSound;
 }
 
 //Getters
@@ -103,6 +116,11 @@ int Menu::getTextSize() const
     return textSize;
 }
 
+sf::Text::Style Menu::getTextStyle() const
+{
+    return textStyle;
+}
+
 sf::Color Menu::getTextColor() const
 {
     return textColor;
@@ -111,6 +129,11 @@ sf::Color Menu::getTextColor() const
 sf::Color Menu::getHighlightColor() const
 {
     return highlightColor;
+}
+
+sf::Sound Menu::getHighlightSound() const
+{
+    return highlightSound;
 }
 
 //Help Functions
@@ -132,6 +155,15 @@ void Menu::applyTextSize()
     {
         for(int i = 0; i < arraySize; i++)
             txtArray[i].setCharacterSize(textSize);
+    }
+}
+
+void Menu::applyTextStyle()
+{
+    if(txtArray != NULL)
+    {
+        for(int i = 0; i < arraySize; i++)
+            txtArray[i].setStyle(textStyle);
     }
 }
 
@@ -163,6 +195,7 @@ void Menu::adjustMenu()
     applyTextFont();
     applyTextColor();
     applyTextSize();
+    applyTextStyle();
     calculateGlobalBounds();
 }
 
@@ -187,15 +220,29 @@ void Menu::display(sf::RenderWindow* aWindow)
             txtArray[i].setPosition(padding + x + width / 2 - txtArray[i].getGlobalBounds().width / 2, txtArray[i - 1].getPosition().y + padding + txtArray[i - 1].getGlobalBounds().height);
             (*aWindow).draw(txtArray[i]);
         }
-        //Text Highlight
+        //Text Highlight and Sound Play
         for(int i = 0; i < arraySize; i++)
         {
             if(textMouseOver(txtArray[i], aWindow))
             {
                 txtArray[i].setColor(highlightColor);
+                if(highlightSound.getStatus() != sf::Sound::Playing && i != rememberI)
+                {
+                    highlightSound.play();
+                    rememberI = i;
+                }
                 break;
             }
-            else adjustMenu();
+            else
+            {
+                adjustMenu();
+                if(i == rememberI)
+                {
+                    rememberI = -1;
+                    //highlightSound.stop(); Add it for instant stop of the sound if mouse goes away from text.
+                }
+            }
+
         }
     }
 }
