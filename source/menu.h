@@ -8,14 +8,14 @@ class Menu
 {
 private:
     int x, y, arraySize, textSize, width, height;
-    double padding; //Padding is the space between every text.
+    double padding;
     sf::Text* txtArray;
     sf::Font textFont;
     sf::Color highlightColor, textColor;
     sf::Text::Style textStyle;
     sf::Sound highlightSound;
 public:
-    Menu(sf::Text* array = NULL, int arrSize = 0, int xCoor = 0, int yCoor = 0, double pad = 5, sf::Font aFont = sf::Font::getDefaultFont(), int txtSize = 25, sf::Text::Style aStyle = sf::Text::Regular, sf::Color textCol = sf::Color::White, sf::Color highlightCol = sf::Color::White);//, sf::Sound highLSound = sf::Sound());    //, int w = 0, int h = 0); If you go pro...
+    Menu(sf::Text* array = NULL, int arrSize = 0);
     ~Menu();
     //Setters
     void setArr(sf::Text* newArr, int size);

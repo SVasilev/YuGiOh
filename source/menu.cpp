@@ -3,17 +3,17 @@
 
 int rememberI = -1;
 
-Menu::Menu(sf::Text* array, int arrSize, int xCoor, int yCoor, double pad, sf::Font aFont, int txtSize, sf::Text::Style aStyle, sf::Color textCol, sf::Color highlightCol)//, sf::Sound highLSound)//, int w, int h)
+Menu::Menu(sf::Text* array, int arrSize) //, int xCoor, int yCoor, double pad, sf::Font aFont, int txtSize, sf::Text::Style aStyle, sf::Color textCol, sf::Color highlightCol)//, sf::Sound highLSound)//, int w, int h)
 {
     txtArray = NULL;
     setArr(array, arrSize);
-    setPosition(xCoor, yCoor);
-    setPadding(pad);
-    setTextFont(aFont);
-    setTextSize(txtSize);
-    setTextStyle(aStyle);
-    setTextColor(textCol);
-    setHighlightColor(highlightCol);
+    setPosition(0, 0);
+    setPadding(5);
+    setTextFont(sf::Font::getDefaultFont());
+    setTextSize(25);
+    setTextStyle(sf::Text::Regular);
+    setTextColor(sf::Color::White);
+    setHighlightColor(sf::Color::White);
 }
 
 Menu::~Menu()
