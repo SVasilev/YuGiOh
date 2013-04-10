@@ -1,23 +1,16 @@
 #include <iostream>
 #include "menu.h"
 
-Menu::Menu(sf::Text* array, int arrSize, sf::Font aFont, int xCoor, int yCoor, double pad, int txtSize, sf::Color textCol, sf::Color highlightCol)//, int w, int h)
+Menu::Menu(sf::Text* array, int arrSize, int xCoor, int yCoor, double pad, sf::Font aFont, int txtSize, sf::Color textCol, sf::Color highlightCol)//, int w, int h)
 {
-    txtArray = new sf::Text[arrSize];
-    for(int i = 0; i < arrSize; i++)
-        txtArray[i] = array[i];
-    arraySize = arrSize;
-    x = xCoor;
-    y = yCoor;
-    padding = pad;
-    textSize = txtSize;
-    applyTextSize();
-    textColor = textCol;
-    highlightColor = highlightCol;
-    applyTextColor();
-    textFont = aFont;
-    applyTextFont();
-    calculateGlobalBounds();
+    txtArray = NULL;
+    setArr(array, arrSize);
+    setPosition(xCoor, yCoor);
+    setPadding(pad);
+    setTextFont(aFont);
+    setTextSize(txtSize);
+    setTextColor(textCol);
+    setHighlightColor(highlightCol);
 }
 
 Menu::~Menu()
@@ -28,20 +21,19 @@ Menu::~Menu()
 //Setters
 void Menu::setArr(sf::Text* newArr, int size)
 {
-    delete[] txtArray;
-    txtArray = new sf::Text[size];
-    for(int i = 0; i < size; i++)
-        txtArray[i] = newArr[i];
-    arraySize = size;
-    applyTextFont();
-    applyTextColor();
-    applyTextSize();
-}
-
-void Menu::setTextFont(sf::Font aFont)
-{
-    textFont = aFont;
-    applyTextFont();
+    if(size != 0)
+    {
+        if(txtArray != NULL) delete[] txtArray;
+        txtArray = new sf::Text[size];
+        for(int i = 0; i < size; i++)
+            txtArray[i] = newArr[i];
+        arraySize = size;
+    }
+    else
+    {
+        if(txtArray != NULL) std::cout << "Warning: No text is set to menu!\n";
+        txtArray = NULL;
+    }
 }
 
 void Menu::setPosition(int left, int top)
@@ -55,16 +47,19 @@ void Menu::setPadding(int pad)
     padding = pad;
 }
 
+void Menu::setTextFont(sf::Font aFont)
+{
+    textFont = aFont;
+}
+
 void Menu::setTextSize(int size)
 {
     textSize = size;
-    applyTextSize();
 }
 
 void Menu::setTextColor(sf::Color aColor)
 {
     textColor = aColor;
-    applyTextColor();
 }
 
 void Menu::setHighlightColor(sf::Color aColor)
@@ -83,11 +78,6 @@ int Menu::getTextArraySize() const
     return arraySize;
 }
 
-sf::Font Menu::getTextFont() const
-{
-    return textFont;
-}
-
 int Menu::getX() const
 {
     return x;
@@ -101,6 +91,11 @@ int Menu::getY() const
 int Menu::getPadding() const
 {
     return padding;
+}
+
+sf::Font Menu::getTextFont() const
+{
+    return textFont;
 }
 
 int Menu::getTextSize() const
@@ -119,36 +114,56 @@ sf::Color Menu::getHighlightColor() const
 }
 
 //Help Functions
+void Menu::applyTextFont()
+{
+    if(txtArray != NULL)
+    {
+        for(int i = 0; i < arraySize; i++)
+        {
+            txtArray[i].setFont(sf::Font::getDefaultFont());
+            txtArray[i].setFont(textFont);
+        }
+    }
+}
 
 void Menu::applyTextSize()
 {
-    for(int i = 0; i < arraySize; i++)
-        txtArray[i].setCharacterSize(textSize);
-    calculateGlobalBounds();
-}
-
-void Menu::applyTextFont()
-{
-    for(int i = 0; i < arraySize; i++)
-        txtArray[i].setFont(textFont);
-    calculateGlobalBounds();
+    if(txtArray != NULL)
+    {
+        for(int i = 0; i < arraySize; i++)
+            txtArray[i].setCharacterSize(textSize);
+    }
 }
 
 void Menu::applyTextColor()
 {
-    for(int i = 0; i < arraySize; i++)
-        txtArray[i].setColor(textColor);
+    if(txtArray != NULL)
+    {
+        for(int i = 0; i < arraySize; i++)
+            txtArray[i].setColor(textColor);
+    }
 }
 
 void Menu::calculateGlobalBounds()
 {
-    int maxTextW = txtArray[0].getGlobalBounds().width;
-    for(int i = 1; i < arraySize; i++)
-        if(txtArray[i].getGlobalBounds().width > maxTextW) maxTextW = txtArray[i].getGlobalBounds().width;
-    width =  maxTextW + 2*padding;
-    height = padding;
-    for(int i = 0; i < arraySize; i++)
-        height += txtArray[i].getGlobalBounds().height + padding;
+    if(txtArray != NULL)
+    {
+        int maxTextW = txtArray[0].getGlobalBounds().width;
+        for(int i = 1; i < arraySize; i++)
+            if(txtArray[i].getGlobalBounds().width > maxTextW) maxTextW = txtArray[i].getGlobalBounds().width;
+        width =  maxTextW + 2*padding;
+        height = padding;
+        for(int i = 0; i < arraySize; i++)
+            height += txtArray[i].getGlobalBounds().height + padding;
+    }
+}
+
+void Menu::adjustMenu()
+{
+    applyTextFont();
+    applyTextColor();
+    applyTextSize();
+    calculateGlobalBounds();
 }
 
 int Menu::getWidth() const
@@ -163,22 +178,25 @@ int Menu::getHeight() const
 
 void Menu::display(sf::RenderWindow* aWindow)
 {
-    txtArray[0].setPosition(padding + x + width / 2 - txtArray[0].getGlobalBounds().width / 2, y + padding);
-    (*aWindow).draw(txtArray[0]);
-    for(int i = 1; i < arraySize; i++)
+    if(txtArray != NULL)
     {
-        txtArray[i].setPosition(padding + x + width / 2 - txtArray[i].getGlobalBounds().width / 2, txtArray[i - 1].getPosition().y + padding + txtArray[i - 1].getGlobalBounds().height);
-        (*aWindow).draw(txtArray[i]);
-    }
-    //Text Highlight
-    for(int i = 0; i < arraySize; i++)
-    {
-        if(textMouseOver(txtArray[i], aWindow))
+        txtArray[0].setPosition(padding + x + width / 2 - txtArray[0].getGlobalBounds().width / 2, y + padding);
+        (*aWindow).draw(txtArray[0]);
+        for(int i = 1; i < arraySize; i++)
         {
-            txtArray[i].setColor(highlightColor);
-            break;
+            txtArray[i].setPosition(padding + x + width / 2 - txtArray[i].getGlobalBounds().width / 2, txtArray[i - 1].getPosition().y + padding + txtArray[i - 1].getGlobalBounds().height);
+            (*aWindow).draw(txtArray[i]);
         }
-        else applyTextColor();
+        //Text Highlight
+        for(int i = 0; i < arraySize; i++)
+        {
+            if(textMouseOver(txtArray[i], aWindow))
+            {
+                txtArray[i].setColor(highlightColor);
+                break;
+            }
+            else adjustMenu();
+        }
     }
 }
 
