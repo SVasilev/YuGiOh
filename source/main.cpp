@@ -73,7 +73,7 @@ int main()
                 }
                 case sf::Event::MouseButtonReleased:
                 {
-                    switch(menu1.boClickIndex(MyGame))
+                    switch(menu1.clickIndex(MyGame))
                     {
                         case -1:
                         {

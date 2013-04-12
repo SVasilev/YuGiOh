@@ -48,7 +48,7 @@ public:
     void adjustMenu();
     int getWidth() const;
     int getHeight() const;
-    int boClickIndex(sf::RenderWindow& aWindow) const;
+    int clickIndex(sf::RenderWindow& aWindow) const;
     void display(sf::RenderWindow* aWindow);
 };
 

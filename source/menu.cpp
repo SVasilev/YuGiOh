@@ -209,7 +209,7 @@ int Menu::getHeight() const
     return height;
 }
 
-int Menu::boClickIndex(sf::RenderWindow& aWindow) const
+int Menu::clickIndex(sf::RenderWindow& aWindow) const
 {
     for(int i = 0; i < arraySize; i++)
         if(textMouseOver(txtArray[i], &aWindow)) return i;
