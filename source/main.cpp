@@ -9,6 +9,12 @@ int main()
 {
     sf::RenderWindow MyGame(sf::VideoMode(800, 600, 32), "MyGame", sf::Style::Default);
 
+    MyGame.setMouseCursorVisible(false);
+    sf::Texture txtCursor;
+    txtCursor.loadFromFile("assets/animaatjes_the_legend_of_zelda_icon6.gif");
+    sf::Sprite sprCursor(txtCursor);
+
+
     //A simple example of how Menu class works.
     sf::Text* txtArr = new sf::Text[5];
     txtArr[0].setString("Start Game");
@@ -106,12 +112,20 @@ int main()
                             break;
                         }
                     }
+                    break;
                 }
+                case sf::Event::MouseMoved:
+                {
+                    sprCursor.setPosition(event.mouseMove.x - sprCursor.getGlobalBounds().width / 3, event.mouseMove.y - sprCursor.getGlobalBounds().height / 3.3);
+                    break;
+                }
+
             }
         }
         MyGame.clear();
         menu1.display(&MyGame);
         player1.display(MyGame);
+        MyGame.draw(sprCursor);
         MyGame.display();
     }
     return 0;
