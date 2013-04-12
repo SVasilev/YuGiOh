@@ -41,7 +41,6 @@ class MonsterCard
             {
                 std::cout << "DEBUG_MESSAGE: Failed to load static overlay (" << overlayPath << ")" << std::endl;
             }
-
         }
 
         //constructors

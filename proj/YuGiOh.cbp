@@ -48,9 +48,15 @@
 			<Add after='cmd /c xcopy &quot;$(PROJECT_DIR)\..\assets&quot; &quot;$(TARGET_OUTPUT_DIR)assets&quot;' />
 			<Mode after="always" />
 		</ExtraCommands>
+		<Unit filename="..\source\healthMana.cpp" />
+		<Unit filename="..\source\healthMana.h" />
 		<Unit filename="..\source\main.cpp" />
 		<Unit filename="..\source\menu.cpp" />
 		<Unit filename="..\source\menu.h" />
+		<Unit filename="..\source\monsterCard.cpp" />
+		<Unit filename="..\source\monsterCard.h" />
+		<Unit filename="..\source\player.cpp" />
+		<Unit filename="..\source\player.h" />
 		<Extensions>
 			<code_completion />
 			<debugger />
