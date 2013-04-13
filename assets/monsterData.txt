@@ -1,0 +1,7 @@
+Akuma assets/image.png 7 1 2 0
+Altair assets/image.png 2 2 0 1
+Bo assets/image.png 12 2 3 4
+Monny assets/image.png -1 -1 0 -1 2
+Zungguzung assets/image.png 1 1 10 0
+
+
