@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <string>
+#include <fstream>
 #include <sstream>
 #include <iostream>
 
@@ -45,7 +46,8 @@ class MonsterCard
 
         //constructors
         MonsterCard();
-        MonsterCard(const sf::Texture& art,const std::string& str_name, int attack, int defense, int manaGive, int costToSummon);
+        MonsterCard(const sf::Texture& art,const std::string& line);
+        //MonsterCard(const sf::Texture& art,const std::string& str_name, int attack, int defense, int manaGive, int costToSummon);
 
         //get
         std::string getName() const;
@@ -53,6 +55,11 @@ class MonsterCard
         int getDefense() const;
         int getManaGive() const;
         int getCostToSummon() const;
+        sf::Text& getMonsterNameText();
+        sf::Text& getAttackText();
+        sf::Text& getDefenseText();
+        sf::Text& getManaGiveText();
+        sf::Text& getCostToSummonText();
         sf::Sprite getOverlay() const;
         sf::Sprite getImage() const;
         bool isDragging() const;
@@ -60,12 +67,15 @@ class MonsterCard
         sf::Vector2f getCardPostion() const;
 
         //set
+        void setImage(const sf::Texture& art);
         void setAttack(const int &dmg);
         void setDefense(const int &def);
         void setManaGive(const int &mana);
         void setCostToSummon(const int &cost);
+        void setCardPosition(const int &x, const int &y);
 
         //other
+        //consider calling it just displayCard();
         void displayMonsterCard(sf::RenderWindow * window = NULL, double scale_x = 1, double scale_y = 1);
         bool mouseOverCard(const sf::Sprite &sprite, sf::RenderWindow* aWindow);
         void moveCard(sf::RenderWindow * window);
@@ -73,9 +83,6 @@ class MonsterCard
 
         //helpers
         std::string int_to_string(const int &num);
-        void setTextFont(sf::Font& aFont);
-        void setTextColor(sf::Color aColor);
-        void setTextStyle(sf::Text::Style aStyle);
         void scaleElements(double scale_x, double scale_y);
         void drawElements(sf::RenderWindow * window);
 

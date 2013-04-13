@@ -5,15 +5,57 @@
 #include "monsterCard.h"
 #include "player.h"
 
+void loadTextures(std::vector<sf::Texture> &vect1, std::ifstream &data)
+{
+    std::string str_fill;
+    std::string texturePath;
+    int int_fill;
+    while (!data.eof())
+    {
+        data >> str_fill >> texturePath >> int_fill >> int_fill >> int_fill >> int_fill;
+        sf::Texture texture;
+        texture.loadFromFile(texturePath);
+        vect1.push_back(texture);
+    }
+
+    data.clear();
+    data.seekg(0, std::ios::beg);
+}
+
 int main()
 {
     sf::RenderWindow MyGame(sf::VideoMode(800, 600, 32), "MyGame", sf::Style::Default);
+    MonsterCard::setOverlay("assets/overlay.png");
 
     MyGame.setMouseCursorVisible(false);
     sf::Texture txtCursor;
     txtCursor.loadFromFile("assets/animaatjes_the_legend_of_zelda_icon6.gif");
     sf::Sprite sprCursor(txtCursor);
 
+    std::ifstream cardData;
+    cardData.open("monsterData.txt");
+    if(cardData.fail())
+    {
+        std::cout << "FAILED TO LOAD MONSTER DATA " << std::endl;
+    }
+
+
+    std::vector<MonsterCard> monsterVector;
+    std::vector<sf::Texture> textureVector;
+    loadTextures(textureVector, cardData);
+    MonsterCard monster1;
+    monsterVector.push_back(monster1);
+    std::string line;
+    int counter = 0;
+    while (getline(cardData, line))
+    {
+        MonsterCard monster2(textureVector[counter], line);
+        monsterVector.push_back(monster2);
+    }
+
+    monsterVector[1].setCardPosition(100,100);
+    monsterVector[0].getAttackText().setCharacterSize(100);
+    monsterVector[0].getAttackText().setColor(sf::Color::Cyan);
 
     //A simple example of how Menu class works.
     sf::Text* txtArr = new sf::Text[5];
@@ -34,6 +76,7 @@ int main()
     sf::SoundBuffer aBuffer;
     aBuffer.loadFromFile("assets/button-6.wav");
     sf::Sound simpleSound(aBuffer);
+    simpleSound.setVolume(0);
 
     Menu menu1(txtArr1, 3);
 
@@ -125,6 +168,8 @@ int main()
         MyGame.clear();
         menu1.display(&MyGame);
         player1.display(MyGame);
+        monsterVector[0].displayMonsterCard(&MyGame);
+        monsterVector[1].displayMonsterCard(&MyGame);
         MyGame.draw(sprCursor);
         MyGame.display();
     }

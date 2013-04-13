@@ -20,8 +20,19 @@ MonsterCard::MonsterCard()
     dragging = false;
 }
 
-MonsterCard::MonsterCard(const sf::Texture& art,const std::string& str_name, int att, int def, int mana, int cost)
+MonsterCard::MonsterCard(const sf::Texture& art,const std::string& line)
 {
+    std::istringstream strm;
+    strm.str(line);
+    std::string str_name;
+    std::string fill;
+    int att = -1;
+    int def = -1;
+    int mana = -1;
+    int cost = -1;
+
+    strm >> str_name >> fill >> att >> def >> mana >> cost;
+
     overlay.setTexture(staticOverlay);
     image.setTexture(art);
 
@@ -46,7 +57,6 @@ MonsterCard::MonsterCard(const sf::Texture& art,const std::string& str_name, int
     costToSummon = cost;
     CostToSummon.setString(int_to_string(costToSummon));
     CostToSummon.setColor(sf::Color::Black);
-
 
     dragging = false;
 }
@@ -76,6 +86,31 @@ int MonsterCard::getCostToSummon() const
     return costToSummon;
 }
 
+sf::Text& MonsterCard::getMonsterNameText()
+{
+    return MonsterName;
+}
+
+sf::Text& MonsterCard::getAttackText()
+{
+    return Attack;
+}
+
+sf::Text& MonsterCard::getManaGiveText()
+{
+    return ManaGive;
+}
+
+sf::Text& MonsterCard::getDefenseText()
+{
+    return Defense;
+}
+
+sf::Text& MonsterCard::getCostToSummonText()
+{
+    return CostToSummon;
+}
+
 sf::Sprite MonsterCard::getOverlay() const
 {
     return overlay;
@@ -95,6 +130,11 @@ sf::Vector2f MonsterCard::getCardPostion() const
 {
     sf::Vector2f position(overlay.getPosition().x, overlay.getPosition().y);
     return position;
+}
+
+void MonsterCard::setImage(const sf::Texture &art)
+{
+    image.setTexture(art);
 }
 
 void MonsterCard::setAttack(const int &dmg)
@@ -119,6 +159,21 @@ void MonsterCard::setCostToSummon(const int &cost)
 {
     costToSummon = cost;
     CostToSummon.setString(int_to_string(costToSummon));
+}
+
+void MonsterCard::setCardPosition(const int &x, const int &y)
+{
+    overlay.setPosition(x, y);
+    float card_x = overlay.getPosition().x;
+    float card_y = overlay.getPosition().y;
+
+    MonsterName.setPosition(card_x + 10, card_y + 5);
+    image.setPosition(card_x + 5, card_y + 37);
+    Attack.setPosition(card_x + 15 , card_y + 180);
+    ManaGive.setPosition(card_x + 80, card_y + 180);
+    Defense.setPosition(card_x + 150, card_y + 180);
+    CostToSummon.setPosition(card_x + 150, card_y + 1);
+
 }
 
 void MonsterCard::displayMonsterCard(sf::RenderWindow * window, double scale_x, double scale_y)
@@ -184,34 +239,6 @@ std::string MonsterCard::int_to_string(const int &num)
     std::string result = strm.str();
     return result;
 }
-
-void MonsterCard::setTextFont(sf::Font& aFont)
-{
-    MonsterName.setFont(aFont);
-    Attack.setFont(aFont);
-    Defense.setFont(aFont);
-    ManaGive.setFont(aFont);
-    CostToSummon.setFont(aFont);
-}
-
-void MonsterCard::setTextColor(sf::Color aColor)
-{
-    MonsterName.setColor(aColor);
-    Attack.setColor(aColor);
-    Defense.setColor(aColor);
-    ManaGive.setColor(aColor);
-    CostToSummon.setColor(aColor);
-}
-
-void MonsterCard::setTextStyle(sf::Text::Style aStyle)
-{
-    MonsterName.setStyle(aStyle);
-    Attack.setStyle(aStyle);
-    Defense.setStyle(aStyle);
-    ManaGive.setStyle(aStyle);
-    CostToSummon.setStyle(aStyle);
-}
-
 
 void MonsterCard::scaleElements(double scale_x, double scale_y)
 {
