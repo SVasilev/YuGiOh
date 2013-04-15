@@ -33,7 +33,7 @@ int main()
     sf::Sprite sprCursor(txtCursor);
 
     std::ifstream cardData;
-    cardData.open("monsterData.txt");
+    cardData.open("assets/monsterData.txt");
     if(cardData.fail())
     {
         std::cout << "FAILED TO LOAD MONSTER DATA " << std::endl;
@@ -43,18 +43,16 @@ int main()
     std::vector<MonsterCard> monsterVector;
     std::vector<sf::Texture> textureVector;
     loadTextures(textureVector, cardData);
-    MonsterCard monster1;
-    monsterVector.push_back(monster1);
     std::string line;
     int counter = 0;
     while (getline(cardData, line))
     {
         MonsterCard monster2(textureVector[counter], line);
         monsterVector.push_back(monster2);
+        counter++;
     }
 
     monsterVector[1].setCardPosition(100,100);
-    monsterVector[0].getAttackText().setCharacterSize(100);
     monsterVector[0].getAttackText().setColor(sf::Color::Cyan);
 
     //A simple example of how Menu class works.
