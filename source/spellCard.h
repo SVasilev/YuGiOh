@@ -77,6 +77,7 @@ class SpellCard
         //call SpellCard::setSpellOverlay("path1", "path2") at the start of main()
         static void setSpellOverlay(const std::string &overlayPath, const std::string &backsidePath);
         void flipCard();
+        void flipCard(const bool &b);
         void displaySpellCard(sf::RenderWindow * window, double scale_x = 1, double scale_y = 1);   //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         bool mouseOverCard(const sf::Sprite &sprite, sf::RenderWindow * window);
         void moveCard(sf::RenderWindow * window);

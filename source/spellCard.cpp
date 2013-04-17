@@ -271,6 +271,11 @@ void SpellCard::flipCard()
 {
     flipped = !(flipped);
 }
+
+void SpellCard::flipCard(const bool &b)
+{
+    flipped = b;
+}
 void SpellCard::displaySpellCard(sf::RenderWindow * window, double scale_x, double scale_y)
 {
     if (isFlipped())

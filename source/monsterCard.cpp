@@ -260,6 +260,10 @@ void MonsterCard::flipCard()
     flipped = !(flipped);
 }
 
+void MonsterCard::flipCard(const bool &b)
+{
+    flipped = b;
+}
 void MonsterCard::rotateCard(const double &angle)
 {
     rotateElements(angle);

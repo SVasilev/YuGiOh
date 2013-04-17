@@ -77,6 +77,7 @@ class MonsterCard
         void setDragging(const bool &b);
         //other
         void flipCard();
+        void flipCard(const bool &b);
         void rotateCard(const double &angle);
         void displayMonsterCard(sf::RenderWindow * window = NULL, double scale_x = 1, double scale_y = 1);
         bool mouseOverCard(const sf::Sprite &sprite, sf::RenderWindow* aWindow);
