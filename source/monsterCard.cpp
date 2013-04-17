@@ -1,13 +1,62 @@
 #include "monsterCard.h"
 
-sf::Texture MonsterCard::staticOverlay;
+//Must fix constants to be according to the card resolution<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+const unsigned int NAME_SIZE = 20;
+const unsigned int COST_SIZE = 27;
+const unsigned int STAT_SIZE = 50;
 
+sf::Texture MonsterCard::staticOverlay;
+sf::Texture MonsterCard::backside;
+sf::Image MonsterCard::overlayImg;
+sf::Vector2f MonsterCard::NAME_BAR_ORIGIN;
+sf::Vector2f MonsterCard::NAME_BAR_BOUNDS;
+sf::Vector2f MonsterCard::IMAGE_ORIGIN;
+sf::Vector2f MonsterCard::IMAGE_BOUNDS;
+sf::Vector2f MonsterCard::STATS_ORIGIN;
+sf::Vector2f MonsterCard::STATS_BOUNDS;
+
+void MonsterCard::setOverlay(const std::string &overlayPath, const std::string &backsidePath)
+{
+    if(!staticOverlay.loadFromFile(overlayPath))
+    {
+        std::cout << "DEBUG_MESSAGE: Failed to load static overlay texture (" << overlayPath << ")" << std::endl;
+    }
+    if(!overlayImg.loadFromFile(overlayPath))
+    {
+        std::cout << "DEBUG_MESSAGE: Failed to load static overlay image (" << overlayPath << ")" << std::endl;
+    }
+    if(!backside.loadFromFile(backsidePath))
+    {
+        std::cout << "DEBUG_MESSAGE: Failed to load backside texture (" << backsidePath << ")" << std::endl;
+    }
+
+    NAME_BAR_ORIGIN = findOrigin(0, 0);
+    NAME_BAR_BOUNDS = findBounds(NAME_BAR_ORIGIN);
+    IMAGE_ORIGIN = findOrigin(0, NAME_BAR_ORIGIN.y + NAME_BAR_BOUNDS.y);
+    IMAGE_BOUNDS = findBounds(IMAGE_ORIGIN);
+    STATS_ORIGIN = findOrigin(0, IMAGE_ORIGIN.y + IMAGE_BOUNDS.y);
+    STATS_BOUNDS = findBounds(STATS_ORIGIN);
+
+    std::cout << "NAME BAR: " << NAME_BAR_ORIGIN.x << " " << NAME_BAR_ORIGIN.y << std::endl;
+    std::cout << "IMG BAR: " << IMAGE_ORIGIN.x << " " << IMAGE_ORIGIN.y << std::endl;
+    std::cout << "STAT BAR: " << STATS_ORIGIN.x << " " << STATS_ORIGIN.y << std::endl;
+    std::cout << "NAME BOUNDS: " << NAME_BAR_BOUNDS.x << " " << NAME_BAR_BOUNDS.y << std::endl;
+    std::cout << "IMG BOUNDS: " << IMAGE_BOUNDS.x << " " << IMAGE_BOUNDS.y << std::endl;
+    std::cout << "STAT BOUNDS: " << STATS_BOUNDS.x << " " << STATS_BOUNDS.y << std::endl;
+}
+
+//constructors
 MonsterCard::MonsterCard()
 {
     overlay.setTexture(staticOverlay);
-    MonsterName.setString("<empty>");
+    monsterName = "<empty>";
+    MonsterName.setString(monsterName);
     MonsterName.setColor(sf::Color::Black);
-    MonsterName.setCharacterSize(20);              //create size global variable
+    MonsterName.setCharacterSize(NAME_SIZE);
+    Attack.setCharacterSize(STAT_SIZE);
+    ManaGive.setCharacterSize(STAT_SIZE);
+    Defense.setCharacterSize(STAT_SIZE);
+    CostToSummon.setCharacterSize(COST_SIZE);
     attack = 0;
     Attack.setString("0");
     manaGive = 0;
@@ -18,6 +67,7 @@ MonsterCard::MonsterCard()
     CostToSummon.setString("0");
 
     dragging = false;
+    flipped = false;
 }
 
 MonsterCard::MonsterCard(const sf::Texture& art,const std::string& line)
@@ -31,16 +81,21 @@ MonsterCard::MonsterCard(const sf::Texture& art,const std::string& line)
     int mana = -1;
     int cost = -1;
 
+    //Must fix to work with multiword names <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     strm >> str_name >> fill >> att >> def >> mana >> cost;
 
     overlay.setTexture(staticOverlay);
     image.setTexture(art);
 
+    MonsterName.setCharacterSize(NAME_SIZE);
+    Attack.setCharacterSize(STAT_SIZE);
+    ManaGive.setCharacterSize(STAT_SIZE);
+    Defense.setCharacterSize(STAT_SIZE);
+    CostToSummon.setCharacterSize(COST_SIZE);
+
     monsterName = str_name;
     MonsterName.setString(monsterName);
     MonsterName.setColor(sf::Color::Black);
-    MonsterName.setCharacterSize(20);           //create SIZE global variable
-
 
     attack = att;
     Attack.setString(int_to_string(attack));
@@ -58,7 +113,10 @@ MonsterCard::MonsterCard(const sf::Texture& art,const std::string& line)
     CostToSummon.setString(int_to_string(costToSummon));
     CostToSummon.setColor(sf::Color::Black);
 
+    std::cout << str_name << " " << fill << " " << att << " " << def << " " << mana << " " << cost << std::endl;
+
     dragging = false;
+    flipped = false;
 }
 
 std::string MonsterCard::getName() const
@@ -126,15 +184,36 @@ bool MonsterCard::isDragging() const
     return dragging;
 }
 
-sf::Vector2f MonsterCard::getCardPostion() const
+bool MonsterCard::isFlipped() const
+{
+    return flipped;
+}
+
+sf::Vector2f MonsterCard::getCardPosition() const
 {
     sf::Vector2f position(overlay.getPosition().x, overlay.getPosition().y);
     return position;
 }
 
+double MonsterCard::getCardWidth() const
+{
+    return overlay.getGlobalBounds().width;
+}
+
+double MonsterCard::getCardHeight() const
+{
+    return overlay.getGlobalBounds().height;
+}
+
 void MonsterCard::setImage(const sf::Texture &art)
 {
     image.setTexture(art);
+}
+
+void MonsterCard::setName(const std::string &str)
+{
+    monsterName = str;
+    MonsterName.setString(monsterName);
 }
 
 void MonsterCard::setAttack(const int &dmg)
@@ -161,42 +240,66 @@ void MonsterCard::setCostToSummon(const int &cost)
     CostToSummon.setString(int_to_string(costToSummon));
 }
 
-void MonsterCard::setCardPosition(const int &x, const int &y)
+void MonsterCard::setCardPosition(const double &x, const double &y)
 {
     overlay.setPosition(x, y);
-    float card_x = overlay.getPosition().x;
-    float card_y = overlay.getPosition().y;
+}
 
-    MonsterName.setPosition(card_x + 10, card_y + 5);
-    image.setPosition(card_x + 5, card_y + 37);
-    Attack.setPosition(card_x + 15 , card_y + 180);
-    ManaGive.setPosition(card_x + 80, card_y + 180);
-    Defense.setPosition(card_x + 150, card_y + 180);
-    CostToSummon.setPosition(card_x + 150, card_y + 1);
+void MonsterCard::setCardPosition(const sf::Vector2f &vect)
+{
+    overlay.setPosition(vect);
+}
 
+void MonsterCard::setDragging(const bool &b)
+{
+    dragging = b;
+}
+
+void MonsterCard::flipCard()
+{
+    flipped = !(flipped);
+}
+
+void MonsterCard::rotateCard(const double &angle)
+{
+    rotateElements(angle);
 }
 
 void MonsterCard::displayMonsterCard(sf::RenderWindow * window, double scale_x, double scale_y)
 {
-    //must decide on actuall card size and come up for placing algorithms
-    //maybe use a constant sized border between the elements for the formula
-    float card_x = overlay.getPosition().x;
-    float card_y = overlay.getPosition().y;
+    if(isFlipped())
+    {
+        overlay.setTexture(backside);
+        overlay.scale(scale_x, scale_y);
+        (*window).draw(overlay);
+    }
+    else
+    {
 
-    MonsterName.setPosition(card_x + 10, card_y + 5);
-    image.setPosition(card_x + 5, card_y + 37);
-    Attack.setPosition(card_x + 15 , card_y + 180);
-    ManaGive.setPosition(card_x + 80, card_y + 180);
-    Defense.setPosition(card_x + 150, card_y + 180);
-    CostToSummon.setPosition(card_x + 150, card_y + 1);
-
-    scaleElements(scale_x, scale_y);
-
-    drawElements(window);
+        overlay.setTexture(staticOverlay);
+        float card_x = overlay.getPosition().x;
+        float card_y = overlay.getPosition().y;
+        scaleElements(scale_x, scale_y);
+        //Must add dynamic scaling to MonsterName, according to the length and size of the name<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        //Must also set appropriate colors and fonts to different texts
+        MonsterName.setColor(sf::Color::Cyan);
+        Attack.setColor(sf::Color::Cyan);
+        ManaGive.setColor(sf::Color::Cyan);
+        Defense.setColor(sf::Color::Cyan);
+        CostToSummon.setColor(sf::Color::Cyan);
+        MonsterName.setPosition((NAME_BAR_ORIGIN.x * scale_x + card_x), (NAME_BAR_ORIGIN.y * scale_y + card_y));
+        image.setPosition((IMAGE_ORIGIN.x * scale_x + card_x), (IMAGE_ORIGIN.y * scale_y + card_y));
+        Attack.setPosition((STATS_ORIGIN.x * scale_x * 1.65 + card_x), (STATS_ORIGIN.y * scale_y + card_y));
+        ManaGive.setPosition((STATS_BOUNDS.x * scale_x * 0.5 + card_x), (STATS_ORIGIN.y * scale_y + card_y));
+        Defense.setPosition((STATS_BOUNDS.x * scale_x - Defense.getGlobalBounds().width + card_x), (STATS_ORIGIN.y * scale_y + card_y));
+        CostToSummon.setPosition((NAME_BAR_BOUNDS.x * scale_x - CostToSummon.getGlobalBounds().width + card_x), (NAME_BAR_BOUNDS.y * scale_y - CostToSummon.getGlobalBounds().height + card_y));
+        drawElements(window);
+    }
 }
 
 bool MonsterCard::mouseOverCard(const sf::Sprite &sprite, sf::RenderWindow* aWindow)
 {
+    //must be used inside an if (Left Mouse Button clicked)
     if(sf::Mouse::getPosition(*aWindow).x >= sprite.getPosition().x &&
        sf::Mouse::getPosition(*aWindow).x <= sprite.getPosition().x + sprite.getGlobalBounds().width &&
        sf::Mouse::getPosition(*aWindow).y >= sprite.getPosition().y &&
@@ -206,7 +309,7 @@ bool MonsterCard::mouseOverCard(const sf::Sprite &sprite, sf::RenderWindow* aWin
 
 
 
-//NOT WORKING PROPERLY
+//NOT WORKING PROPERLY(especially now)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 void MonsterCard::moveCard(sf::RenderWindow * window)
 {
     sf::Vector2f startPos = sf::Vector2f(0.0f, 0.0f);
@@ -262,9 +365,59 @@ void MonsterCard::drawElements(sf::RenderWindow * window)
     (*window).draw(ManaGive);
 }
 
+//NOT WORKING PROPERLY, must find a way to set center of rotation, and also fix how the elements will be displayed<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+void MonsterCard::rotateElements(const double &angle)
+{
+    overlay.rotate(angle);
+    MonsterName.rotate(angle);
+    image.rotate(angle);
+    Attack.rotate(angle);
+    ManaGive.rotate(angle);
+    Defense.rotate(angle);
+    CostToSummon.rotate(angle);
+}
 
+sf::Vector2f MonsterCard::findOrigin(float startX, float startY)
+{
+    sf::Color borderColor;
+    borderColor = overlayImg.getPixel(startX, startY);
+    float overlay_width, overlay_height;
+    //Must figure out a way to avoid these contants, since you can't access private members from static func<<<<<<<<<<<<<<<<<<<<<<
+    overlay_width = 240; //overlay.getGlobalBounds().width;
+    overlay_height = 340; //overlay.getGlobalBounds().height;
+    std::cout << "overlay width: " << overlay_width << " / overlay_height: " << overlay_height << std::endl;
 
+    for (int y = startY; y < overlay_height; y++)
+    {
+        for (int x = startX; x < overlay_width; x++)
+        {
+            if (overlayImg.getPixel(x, y) != borderColor)
+            {
+                sf::Vector2f result(x, y);
+                return result;
+            }
+        }
+    }
+    std::cout << "Error: origin of specific card area not found. " << std::endl;
+    sf::Vector2f error(-1, -1);
+    return error;
+}
 
-
-
+sf::Vector2f MonsterCard::findBounds(const sf::Vector2f &vect)
+{
+    int xBound = 0;
+    int yBound = 0;
+    sf::Color areaColor;
+    areaColor = overlayImg.getPixel(vect.x, vect.y);
+    for (int x = vect.x; overlayImg.getPixel(x, vect.y) == areaColor; x++)
+    {
+        xBound++;
+    }
+    for (int y = vect.y; overlayImg.getPixel(vect.x, y) == areaColor; y++)
+    {
+        yBound++;
+    }
+    sf::Vector2f result(xBound, yBound);
+    return result;
+}
 

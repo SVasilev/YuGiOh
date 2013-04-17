@@ -3,6 +3,7 @@
 #include <SFML/Audio.hpp>
 #include "menu.h"
 #include "monsterCard.h"
+#include "spellCard.h"
 #include "player.h"
 
 void loadTextures(std::vector<sf::Texture> &vect1, std::ifstream &data)
@@ -25,7 +26,8 @@ void loadTextures(std::vector<sf::Texture> &vect1, std::ifstream &data)
 int main()
 {
     sf::RenderWindow MyGame(sf::VideoMode(800, 600, 32), "MyGame", sf::Style::Default);
-    MonsterCard::setOverlay("assets/overlay.png");
+    MonsterCard::setOverlay("assets/borders.png", "assets/backside.png");
+    SpellCard::setSpellOverlay("assets/borders.png", "assets/backside.png");
 
     MyGame.setMouseCursorVisible(false);
     sf::Texture txtCursor;
@@ -33,7 +35,7 @@ int main()
     sf::Sprite sprCursor(txtCursor);
 
     std::ifstream cardData;
-    cardData.open("assets/monsterData.txt");
+    cardData.open("monsterData.txt");
     if(cardData.fail())
     {
         std::cout << "FAILED TO LOAD MONSTER DATA " << std::endl;
@@ -52,8 +54,17 @@ int main()
         counter++;
     }
 
-    monsterVector[1].setCardPosition(100,100);
-    monsterVector[0].getAttackText().setColor(sf::Color::Cyan);
+    monsterVector[0].setCardPosition(350,350);
+    monsterVector[1].setCardPosition(150,150);
+    monsterVector[2].setCardPosition(300,300);
+    monsterVector[0].flipCard();
+    monsterVector[2].rotateCard(180);
+
+    SpellCard s1("Diariq");
+    SpellCard s2("Determinizym");
+    s1.setPosition(50,50);
+    s1.flipCard();
+    s2.setPosition(10, 10);
 
     //A simple example of how Menu class works.
     sf::Text* txtArr = new sf::Text[5];
@@ -166,10 +177,13 @@ int main()
         MyGame.clear();
         menu1.display(&MyGame);
         player1.display(MyGame);
-        monsterVector[0].displayMonsterCard(&MyGame);
-        monsterVector[1].displayMonsterCard(&MyGame);
+        monsterVector[1].displayMonsterCard(&MyGame, 0.5, 0.5);
+        //monsterVector[2].displayMonsterCard(&MyGame);
+        //monsterVector[0].displayMonsterCard(&MyGame);
+        s1.displaySpellCard(&MyGame, 0.5, 0.5);
         MyGame.draw(sprCursor);
         MyGame.display();
+        //MyGame.close();
     }
     return 0;
 }

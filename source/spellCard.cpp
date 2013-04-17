@@ -1,6 +1,8 @@
 #include "spellCard.h"
 
 sf::Texture SpellCard::staticOverlay;
+sf::Texture SpellCard::backside;
+
 //constructors
 SpellCard::SpellCard()
 {
@@ -13,6 +15,7 @@ SpellCard::SpellCard()
     playerMod = false;
     slotMod = false;
     dragging = false;
+    flipped = false;
 
     attMod = 0;
     defMod = 0;
@@ -24,6 +27,8 @@ SpellCard::SpellCard()
 
 SpellCard::SpellCard(const sf::Texture &art, const std::string &line)
 {
+    flipped = false;
+    dragging = false;
     overlay.setTexture(staticOverlay);
     image.setTexture(art);
     std::istringstream strm;
@@ -31,7 +36,7 @@ SpellCard::SpellCard(const sf::Texture &art, const std::string &line)
     std::string fill;
     strm >> spellName >> fill >> modCount;
     int * temp = new int[modCount];
-    //fix order in which elements are assigned to correspond to text file.
+    //fix order in which elements are assigned to correspond to text file<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
     for (int k = 0; k < modCount; k++)
     {
         strm >> temp[k];
@@ -63,6 +68,8 @@ SpellCard::SpellCard(const std::string lainovoz)
     overlay.setTexture(staticOverlay);
     spellName = lainovoz;
     SpellName.setString(spellName);
+    flipped = false;
+    dragging = false;
 }
 
 
@@ -136,6 +143,13 @@ void SpellCard::setPosition(const float &x, const float &y)
     //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 }
 
+void SpellCard::setPosition(const sf::Vector2f &vect)
+{
+    overlay.setPosition(vect);
+    SpellName.setPosition(vect.x + 10, vect.y + 5);
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+}
+
 //get
 sf::Sprite SpellCard::getOverlay() const
 {
@@ -187,6 +201,11 @@ bool SpellCard::isDragging() const
     return dragging;
 }
 
+bool SpellCard::isFlipped() const
+{
+    return flipped;
+}
+
 int SpellCard::getAttMod() const
 {
     return attMod;
@@ -226,16 +245,54 @@ float SpellCard::getHeight() const
 {
     return overlay.getGlobalBounds().height;
 }
+
+sf::Vector2f SpellCard::getCardPosition() const
+{
+    sf::Vector2f position(overlay.getPosition().x, overlay.getPosition().y);
+    return position;
+}
+
 //others
+void SpellCard::setSpellOverlay(const std::string &overlayPath, const std::string &backsidePath)
+{
+    if(!staticOverlay.loadFromFile(overlayPath))
+    {
+        std::cout << "DEBUG_MESSAGE: Failed to load static spell overlay (" << overlayPath << ")" << std::endl;
+    }
+    if(!backside.loadFromFile(backsidePath))
+    {
+        std::cout << "DEBUG_MESSAGE: Failed to load static spell backside (" << backsidePath << ")" << std::endl;
+    }
+
+    //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+}
+void SpellCard::flipCard()
+{
+    flipped = !(flipped);
+}
 void SpellCard::displaySpellCard(sf::RenderWindow * window, double scale_x, double scale_y)
 {
-    float card_x = overlay.getPosition().x;
-    float card_y = overlay.getPosition().y;
-    SpellName.setPosition(card_x + 10, card_y + 5);
-    SpellName.setColor(sf::Color::Black);
-    SpellName.setCharacterSize(25);
-    (*window).draw(overlay);
-    (*window).draw(SpellName);
+    if (isFlipped())
+    {
+        overlay.setTexture(backside);
+        overlay.setScale(scale_x, scale_y);
+        (*window).draw(overlay);
+    }
+    else
+    {
+        overlay.setTexture(staticOverlay);
+        overlay.setScale(scale_x, scale_y);
+        SpellName.setScale(scale_x, scale_y);
+        float card_x = overlay.getPosition().x;
+        float card_y = overlay.getPosition().y;
+        SpellName.setPosition(card_x + 10, card_y + 5);
+        SpellName.setColor(sf::Color::Black);
+        SpellName.setCharacterSize(25);
+        (*window).draw(overlay);
+        (*window).draw(SpellName);
+        //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    }
 }
 
 
